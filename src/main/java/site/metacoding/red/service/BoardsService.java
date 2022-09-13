@@ -25,8 +25,8 @@ public class BoardsService {
 		boardsDao.insert(boards);
 	}
 	
-	public List<MainDto> 게시글목록보기() {
-		List<MainDto> boardsList = boardsDao.findMainBoards();
+	public List<MainDto> 게시글목록보기(Integer page, String keyword) {
+		List<MainDto> boardsList = boardsDao.findMainBoards(page, keyword);
 		return boardsList;
 	}
 	
@@ -51,5 +51,7 @@ public class BoardsService {
 	public void 글삭제하기(Integer id) {
 		boardsDao.deleteById(id);
 	}
+	
+	
 	
 }

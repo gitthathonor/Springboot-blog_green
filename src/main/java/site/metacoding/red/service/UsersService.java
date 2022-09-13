@@ -11,8 +11,9 @@ import site.metacoding.red.web.dto.request.users.JoinDto;
 import site.metacoding.red.web.dto.request.users.LoginDto;
 import site.metacoding.red.web.dto.request.users.UpdateDto;
 
-@Service
+
 @RequiredArgsConstructor
+@Service
 public class UsersService {
 	
 	private final UsersDao usersDao;

@@ -2,74 +2,82 @@ package site.metacoding.red.web;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import lombok.RequiredArgsConstructor;
 import site.metacoding.red.domain.users.Users;
-import site.metacoding.red.domain.users.UsersDao;
 import site.metacoding.red.service.UsersService;
+import site.metacoding.red.util.Script;
 import site.metacoding.red.web.dto.request.users.JoinDto;
 import site.metacoding.red.web.dto.request.users.LoginDto;
 import site.metacoding.red.web.dto.request.users.UpdateDto;
 
 @RequiredArgsConstructor
-@RestController
+@Controller
 public class UsersController {
-
+	
+	
 	private final UsersService usersService;
 	private final HttpSession session;
 	
-	@GetMapping("/users/{id}")
-	public Users getUsers(@PathVariable Integer id) {
-		return usersService.회원정보보기(id);
+	@GetMapping("/joinForm")
+	public String joinForm() {
+		return "users/joinForm";
+	}
+	
+	@GetMapping("/loginForm")
+	public String loginForm() { //쿠키
+		return "users/loginForm";
 	}
 	
 	@PostMapping("/join")
-	public String join(String username, JoinDto joinDto) {
-		boolean CheckingId = usersService.아이디중복확인(username);
-		if(CheckingId == true) {
-			return "아이디가 중복됩니다";
-		}
+	public String join(JoinDto joinDto) {
 		usersService.회원가입(joinDto);
-		return "회원가입완료";
+		return "redirect:/loginForm";
 	}
 	
-	@PostMapping("/login") 
-	public String login(LoginDto loginDto) {
-		Users usersPS = usersService.로그인(loginDto);
-		if(usersPS == null) {
-			return "로그인 실패";
+	@PostMapping("/login")
+	public @ResponseBody String login(LoginDto loginDto) {
+		Users principal = usersService.로그인(loginDto);
+		
+		if(principal == null) {
+			return Script.back("아이디 혹은 비밀번호가 틀렸습니다");
 		}
-		session.setAttribute("principal", usersPS);
-		return "로그인 완료";
+		
+		session.setAttribute("principal", principal);
+		return Script.href("/");
 	}
 	
+	@GetMapping("/users/{id}")
+	public String updateForm(@PathVariable Integer id, Model model) {
+		Users usersPS = usersService.회원정보보기(id);
+		model.addAttribute("users", usersPS);
+		return "users/updateForm";
+	}
 	
-	@PutMapping("/users/{id}/update")
+	@PutMapping("/users/{id}")
 	public String update(@PathVariable Integer id, UpdateDto updateDto) {
-//		Users usersPS = (Users)session.getAttribute("principal");
-//		if(id != usersPS.getId()) {
-//			return "회원수정 하실 수 없습니다.";
-//		}
 		usersService.회원수정(id, updateDto);
-		return "회원수정 완료";
+		return "redirect:/users/"+id;
 	}
 	
-	@DeleteMapping("/users/{id}/delete")
-	public String delete(@PathVariable Integer id) {
-//		Users usersPS = (Users)session.getAttribute("principal");
-//		if(id != usersPS.getId()) {
-//			return "회원탈퇴 하실 수 없습니다.";
-//		}
+	@DeleteMapping("/users/{id}")
+	public @ResponseBody String delete(@PathVariable Integer id) {
 		usersService.회원탈퇴(id);
-		return "회원탈퇴 완료";
+		return Script.href("/loginForm", "회원탈퇴가 완료되었습니다.");
 	}
 	
-	
+	@GetMapping("/logout")
+	public String logout() {
+		session.invalidate();
+		return "/loginForm";
+	}
 	
 }
