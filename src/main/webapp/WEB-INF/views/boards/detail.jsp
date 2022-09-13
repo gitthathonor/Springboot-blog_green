@@ -5,16 +5,16 @@
 <div class="container">
 	<br /> <br />
 
-
+	<c:if test="${boards.usersId == principal.id}">
 		<div class="d-flex">
-		
-			<a href="#" class="btn btn-warning">수정하러가기</a>
-
+			<form action="/boards/${boards.id}/updateForm" method="get">
+				<button type="submit" class="btn btn-warning">수정하러가기</button>
+			</form>
 			<form>
 				<button class="btn btn-danger">삭제</button>
 			</form>
 		</div>
-
+	</c:if>
 
 	<br />
 	<div>

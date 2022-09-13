@@ -5,8 +5,7 @@
 <mapper namespace="site.metacoding.red.domain.boards.BoardsDao">
 
 	<insert id="insert">
-		INSERT INTO boards(title, content, usersId,
-		createdAt)
+		INSERT INTO boards(title, content, usersId, createdAt)
 		VALUES(#{title}, #{content}, #{usersId}, now())
 	</insert>
 
@@ -17,13 +16,15 @@
 
 	<select id="findAll"
 		resultType="site.metacoding.red.web.dto.response.boards.MainDto">
-		SELECT b.id, b.title, u.username 
+		SELECT b.id, b.title,
+		case when u.username is null then 'anonymous'
+		else u.username end username 
 		FROM boards b
-		INNER JOIN
-		users u
+		LEFT OUTER JOIN
+		users u 
 		ON b.usersId = u.id
 		<if test="keyword != null">
-			WHERE title LIKE '%'||#{keyword}||'%'
+			WHERE title LIKE CONCAT('%',#{keyword},'%')
  		</if>
 		ORDER BY b.id DESC
 		OFFSET #{startNum} ROWS
@@ -31,8 +32,7 @@
 	</select>
 
 	<update id="update">
-		UPDATE boards SET title = #{title}, content =
-		#{content} WHERE id = #{id}
+		UPDATE boards SET title = #{title}, content = #{content} WHERE id = #{id}
 	</update>
 
 	<delete id="deleteById">
@@ -66,7 +66,7 @@
 		isLast
 		FROM boards
 		<if test="keyword != null">
-			WHERE title LIKE '%'||#{keyword}||'%'
+			WHERE title LIKE CONCAT('%',#{keyword},'%')
  		</if>
 		) boards
 		

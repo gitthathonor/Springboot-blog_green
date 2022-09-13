@@ -24,23 +24,21 @@ public class BoardsService {
 	}
 	
 	public PagingDto 게시글목록보기(Integer page, String keyword) {
+		
 		if (page == null) {
 			page = 0;
 		}
+		
 		System.out.println("page : " + page);
 		int startNum = page * 3;
 		
 		List<MainDto> boardsList = boardsDao.findAll(startNum, keyword);
-		System.out.println("list가져오기 완료");
-		
 		PagingDto pagingDto = boardsDao.paging(page, keyword);
-		System.out.println("PagingDto가져오기 완료");
 		
 		if (boardsList.size() == 0) {
 			pagingDto.setFirst(true);
 			pagingDto.setLast(true);
 		}
-		System.out.println(boardsList.size());
 		
 		pagingDto.setMainDtos(boardsList);
 		
@@ -61,6 +59,7 @@ public class BoardsService {
 	
 	
 	public void 삭제하기(Integer id) {
+		Boards boardsPS = boardsDao.findById(id);
 		boardsDao.deleteById(id);
 	}
 	
