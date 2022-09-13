@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="site.metacoding.red.domain.boards.BoardsDao">
+	
+	<insert id="insert">
+		INSERT INTO boards(title, content, usersId, createdAt) 
+		VALUES(#{title}, #{content}, #{usersId}, now())
+	</insert>
+
+	<select id="findById" resultType="site.metacoding.red.domain.boards.Boards">
+		SELECT * FROM boards WHERE id = #{id}
+	</select>
+
+	<select id="findAll" resultType="site.metacoding.red.domain.boards.Boards">
+		SELECT * FROM boards ORDER BY id DESC
+	</select>
+	
+	<select id="findMainBoards" resultType="site.metacoding.red.web.dto.response.boards.MainDto">
+		SELECT b.id, b.title, u.username FROM boards b JOIN users u ON b.usersId = u.id ORDER BY id DESC
+	</select>
+	
+	<update id="update">
+		UPDATE boards SET title = #{title}, content = #{content} WHERE id = #{id}
+	</update>
+	
+	<delete id="deleteById">
+		DELETE FROM boards WHERE id = #{id}
+	</delete>
+
+	<update id="updateNullData">
+		UPDATE boards SET usersId = null WHERE usersId = #{id}
+	</update>
+	
+</mapper>
