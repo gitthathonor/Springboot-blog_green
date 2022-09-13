@@ -11,10 +11,10 @@
 		</div>
 		<div class="mb-3">
 			<input type="password" class="form-control"
-				placeholder="Enter password" value="1234">
+				placeholder="Enter password" value="${principal.password }">
 		</div>
 		<div class="mb-3">
-			<input type="email" class="form-control" placeholder="Enter email" value="ssar@nate.com">
+			<input type="email" class="form-control" placeholder="Enter email" value="${principal.email} ">
 		</div>
 		<button type="submit" class="btn btn-primary">수정완료</button>
 	</form>

@@ -49,7 +49,7 @@ public class UsersApiController {
 		return "로그인 완료";
 	}
 
-	@PutMapping("/users/{id}/update")
+	@PutMapping("/api/users/{id}/update")
 	public String update(@PathVariable Integer id, UpdateDto updateDto) {
 //		Users usersPS = (Users)session.getAttribute("principal");
 //		if(id != usersPS.getId()) {
