@@ -44,7 +44,7 @@
 		#{id}
 	</update>
 
-	<select id="paging" resultType="site.metacoding.red.web.dto.response.boards.PagingDto">
+	<!-- <select id="paging" resultType="site.metacoding.red.web.dto.response.boards.PagingDto">
 		SELECT
 		floor(currentPage/blockCount) blockPage,
 		blockCount,
@@ -70,6 +70,27 @@
  		</if>
 		) boards
 		
+	</select> -->
+	
+	<select id="paging"
+		resultType="site.metacoding.red.web.dto.response.boards.PagingDto">
+		SELECT totalCount,
+		totalPage,
+		currentPage,
+		if(currentPage = 0, 1, 0) first,
+		if(currentPage = totalPage-1, 1, 0) last
+		FROM
+		(
+		select count(*)
+		totalCount, ceil(count(*)/3) totalPage,
+		#{page} currentPage, 0
+		first, 0
+		last
+		FROM boards
+		<if test="keyword != null">
+			WHERE title like CONCAT('%',#{keyword},'%')
+		</if>
+		) result
 	</select>
 
 </mapper>

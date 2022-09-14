@@ -40,7 +40,7 @@ public class BoardsController {
 		if (principal == null) {
 			return "redirect:/loginForm";
 		}
-		boardsService.글쓰기(principal.getId(), writeDto);
+		boardsService.글쓰기(writeDto, principal);
 		return "redirect:/";
 	}
 	
@@ -54,55 +54,30 @@ public class BoardsController {
 	
 	@GetMapping({"/","/boards"})
 	public String getBoardsList(Model model, Integer page, String keyword) {
-		System.out.println("controller성공");
 		PagingDto pagingDto = boardsService.게시글목록보기(page, keyword);
-		System.out.println("service성공");
 		model.addAttribute("paging", pagingDto);
 		model.addAttribute("keyword", keyword);
 		return "boards/main";
 	}
 	
-	@GetMapping("/boards/{id}/updateForm") 
+	
+	@PutMapping("/boards/{id}")
+	public String update(@PathVariable Integer id, UpdateDto updateDto) {
+		boardsService.수정하기(id, updateDto);
+		return "redirect:/boards/" + id;
+	}
+
+	@GetMapping("/boards/{id}/updateForm")
 	public String updateForm(@PathVariable Integer id, Model model) {
 		Boards boardsPS = boardsService.게시글상세보기(id);
 		model.addAttribute("boards", boardsPS);
 		return "boards/updateForm";
 	}
-	
-	@PostMapping("/boards/{id}/update")
-	public String updateBoards(@PathVariable Integer id, UpdateDto updateDto) {
-		boardsService.수정하기(id, updateDto);
-		return "redirect:/boards/"+id;
-	}
-	
-	@PostMapping("/boards/{id}/delete")
+
+	@DeleteMapping("/boards/{id}")
 	public String deleteBoards(@PathVariable Integer id) {
-		Users principal = (Users) session.getAttribute("principal");
-		if (principal == null) {
-			return "redirect:/loginForm";
-		}
 		boardsService.삭제하기(id);
 		return "redirect:/";
 	}
-	
-	
-//	@PutMapping("/boards/{id}")
-//	public String update(@PathVariable Integer id, UpdateDto updateDto) {
-//		boardsService.게시글수정하기(id, updateDto);
-//		return "redirect:/boards/" + id;
-//	}
-//
-//	@GetMapping("/boards/{id}/updateForm")
-//	public String updateForm(@PathVariable Integer id, Model model) {
-//		Boards boardsPS = boardsService.게시글상세보기(id);
-//		model.addAttribute("boards", boardsPS);
-//		return "boards/updateForm";
-//	}
-//
-//	@DeleteMapping("/boards/{id}")
-//	public String deleteBoards(@PathVariable Integer id) {
-//		boardsService.게시글삭제하기(id);
-//		return "redirect:/";
-//	}
 
 }
