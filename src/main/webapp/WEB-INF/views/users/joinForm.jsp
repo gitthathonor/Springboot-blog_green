@@ -5,7 +5,7 @@
 <div class="container">
 	<form>
 		<div class="mb-3 mt-3">
-			<input id="username" type="text" class="form-control" placeholder="Enter username">
+			<input id="username" type="text" class="form-control" placeholder="Enter username" >
 			<button id="btnUsernameSameCheck" class="btn btn-warning" type="button">유저네임 중복체크</button>
 		</div>
 		<div class="mb-3">
@@ -25,20 +25,26 @@
 	let isUsernameSameCheck = false;
 	
 	
+	
+	$("#username").keydown(()=>{
+		if(event.keyCode == 32) {
+			alert("공백을 입력할 수 없습니다.");
+			$("#username").focus();
+			return;
+		}
+	});
+	
+	
+	
 	// 회원가입
 	$("#btnJoin").click(()=>{
 		
 		// 아이디 중복체크 여부를 먼저 확인한다.
 		if(isUsernameSameCheck == false) {
 			alert("아이디 중복 체크를 진행해주세요!");
+			$("#btnUsernameSameCheck").focus();
 			return;
 		}
-		
-		// 비밀번호 확인
-		/* if($("#password").val() != $("#passwordSame").val()) {
-			alert("비밀번호가 일치하지 않습니다.");
-			return;
-		} */
 		
 		
 		// 통신 object 생성(get 요청 시에는 필요가 없다. get요청은 body가 없기 때문)
@@ -57,7 +63,6 @@
 			}
 		}).done((res)=>{
 			if(res.code == 1) {
-				// console.log(res);
 				location.href="/loginForm";
 			}
 		});
@@ -72,6 +77,12 @@
 		// 1. 사용자가 적은 username 값을 가져오기(input 태그에 id를 걸자)
 		let username = $("#username").val()
 		
+		
+		if(username == "" || username.includes(" ")) {
+			alert("username을 입력해주세요");
+			return;
+		}
+		
 		// 2. Ajax 통신
 		$.ajax("/users/usernameSameCheck?username="+username,{
 			type:"GET",
@@ -84,10 +95,11 @@
 				if(res.data == false) {
 					alert("아이디가 중복되지 않았습니다.");
 					isUsernameSameCheck = true;
+					$("#password").focus();
 				} else {
 					alert("아이디가 중복되었습니다. 다른 아이디를 사용해주세요!");
 					isUsernameSameCheck = false;
-					$("#username").val("");
+					$("#username").focus();
 				}
 			}
 		});
