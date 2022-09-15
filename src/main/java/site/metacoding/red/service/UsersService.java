@@ -29,6 +29,10 @@ public class UsersService {
 	public Users 로그인(LoginDto loginDto) { // Dto(username, password)
 		Users usersPS = usersDao.findByUsername(loginDto.getUsername());
 		
+		if(usersPS == null) {
+			return null;
+		}
+		
 		// if로 usersPS의 password와 Dto password 비교
 		if(!(usersPS.getPassword().equals(loginDto.getPassword()))) {
 			return null;
@@ -36,13 +40,15 @@ public class UsersService {
 		return usersPS;
 	}
 	
-	public void 회원수정(Integer id, UpdateDto updateDto) { // id, Dto(password, email)
+	public Users 회원수정(Integer id, UpdateDto updateDto) { // id, Dto(password, email)
 		// 1. 영속화
 		Users usersPS = usersDao.findById(id);
 		// 2. 영속화된 객체 변경
 		usersPS.updateUsers(updateDto);
 		// 3. DB 수행
 		usersDao.update(usersPS);
+		
+		return usersPS;
 	}
 	
 	// Users-delete, Boards - update
@@ -57,15 +63,15 @@ public class UsersService {
 	//HttpServletRequest와 HttpServletResponse 객체를 통해서 하는데 그 책임은 Controller에게 있다. (Session관리 포함)
 	//public void 로그아웃() {} 
 	
-	public boolean 아이디중복확인(String username) {
+	public boolean 유저네임중복확인(String username) {
 		Users usersPS = usersDao.findByUsername(username);
 		
 		// 있으면 true, 없으면 false를 리턴
-		if(usersPS != null) {
+		if(usersPS == null) {
+			return false;
+		} else {
 			return true;
 		}
-		
-		return false;
 	}
 	
 	public Users 회원정보보기(Integer id) {

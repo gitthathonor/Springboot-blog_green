@@ -31,7 +31,7 @@ public class UsersApiController {
 	
 	@PostMapping("/api/join")
 	public String join(String username, JoinDto joinDto) {
-		boolean CheckingId = usersService.아이디중복확인(username);
+		boolean CheckingId = usersService.유저네임중복확인(username);
 		if(CheckingId == true) {
 			return "아이디가 중복됩니다";
 		}

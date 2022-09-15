@@ -41,7 +41,7 @@
 
 	<update id="updateNullData">
 		UPDATE boards SET usersId = null WHERE usersId =
-		#{id}
+		#{usersId}
 	</update>
 
 	<!-- <select id="paging" resultType="site.metacoding.red.web.dto.response.boards.PagingDto">
