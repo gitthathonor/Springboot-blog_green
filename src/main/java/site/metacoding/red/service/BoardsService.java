@@ -31,15 +31,11 @@ public class BoardsService {
 			page = 0;
 		}
 		
-		int startNum = page * 3;
+		int startNum = page * 5;
 		
 		List<MainDto> boardsList = boardsDao.findAll(startNum, keyword);
 		PagingDto pagingDto = boardsDao.paging(page, keyword);
 		
-		/*
-		 * if (boardsList.size() == 0) { pagingDto.setFirst(true);
-		 * pagingDto.setLast(true); }
-		 */
 		if (boardsList.size() == 0) {
 			pagingDto.setLast(true);
 			pagingDto.setFirst(true);

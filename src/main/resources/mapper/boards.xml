@@ -17,7 +17,7 @@
 	<select id="findAll"
 		resultType="site.metacoding.red.web.dto.response.boards.MainDto">
 		SELECT b.id, b.title,
-		case when u.username is null then 'anonymous'
+		case when u.username is null then '익명'
 		else u.username end username 
 		FROM boards b
 		LEFT OUTER JOIN
@@ -28,7 +28,7 @@
  		</if>
 		ORDER BY b.id DESC
 		OFFSET #{startNum} ROWS
-		FETCH NEXT 3 ROWS ONLY
+		FETCH NEXT 5 ROWS ONLY
 	</select>
 
 	<update id="update">
@@ -82,7 +82,7 @@
 		FROM
 		(
 		select count(*)
-		totalCount, ceil(count(*)/3) totalPage,
+		totalCount, ceil(count(*)/5) totalPage,
 		#{page} currentPage, 0
 		first, 0
 		last

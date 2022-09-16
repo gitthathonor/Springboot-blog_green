@@ -117,7 +117,8 @@ function checkUsername() {
 function login() {
 	let data = {
 		username: $("#username").val(),
-		password: $("#password").val()
+		password: $("#password").val(),
+		remember:$("#remember").prop("checked")
 	};
 
 	$.ajax("/login", {
