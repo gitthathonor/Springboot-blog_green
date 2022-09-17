@@ -19,6 +19,8 @@ public class Boards {
 	private Integer usersId;
 	private Timestamp createdAt; // At 시분초 다 표현할 때, Dt 년월일만 표현
 	
+	private Integer likeCounts; // 좋아요 카운트 수
+	
 	public Boards(Integer usersId,String title, String content) {
 		this.usersId = usersId;
 		this.title = title;

@@ -68,16 +68,42 @@ public class BoardsController {
 	}
 	
 	@PutMapping("/boards/{id}")
-	public String update(@PathVariable Integer id, UpdateDto updateDto) {
+	public @ResponseBody CMRespDto<?> update(@PathVariable Integer id, @RequestBody UpdateDto updateDto) {
 		boardsService.수정하기(id, updateDto);
-		return "redirect:/boards/" + id;
+		return new CMRespDto<>(1, "게시글 수정 성공", null);
 	}
 	
 
 	@DeleteMapping("/boards/{id}")
-	public String deleteBoards(@PathVariable Integer id) {
+	public @ResponseBody CMRespDto<?> deleteBoards(@PathVariable Integer id) {
 		boardsService.삭제하기(id);
-		return "redirect:/";
+		return new CMRespDto<>(1, "게시글 삭제완료", null);
+	}
+	
+	// 좋아요 눌렀을 때 
+	@PostMapping("/boards/{id}/like")
+	public @ResponseBody CMRespDto<?> insertLike(@PathVariable Integer id) {
+		Users principal = (Users) session.getAttribute("principal");
+		try {
+			return new CMRespDto<>(1, "좋아요", boardsService.좋아요(principal.getId(), id));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new CMRespDto<>(-1, "principal이 null 입니다.", null);
+		}
+	}
+	
+	
+	// 좋아요 삭제했을 때
+	@DeleteMapping("/boards/{id}/like")
+	public @ResponseBody CMRespDto<?> deleteLike(@PathVariable Integer id) {
+		Users principal = (Users) session.getAttribute("principal");
+		try {
+			return new CMRespDto<>(1, "좋아요 취소", boardsService.좋아요취소(principal.getId(), id));
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new CMRespDto<>(-1, "principal이 null 입니다.", null);
+		}
+		
 	}
 
 }

@@ -5,34 +5,41 @@
 <mapper namespace="site.metacoding.red.domain.boards.BoardsDao">
 
 	<insert id="insert">
-		INSERT INTO boards(title, content, usersId, createdAt)
+		INSERT INTO boards(title, content, usersId,
+		createdAt)
 		VALUES(#{title}, #{content}, #{usersId}, now())
 	</insert>
 
 	<select id="findById"
 		resultType="site.metacoding.red.domain.boards.Boards">
-		SELECT * FROM boards WHERE id = #{id}
+		SELECT id, title, content, usersId, createdAt, (SELECT COUNT(*)
+		FROM likes
+		WHERE boardsId = #{id}) likeCounts
+		FROM boards
+		WHERE id = #{id};
 	</select>
 
 	<select id="findAll"
 		resultType="site.metacoding.red.web.dto.response.boards.MainDto">
 		SELECT b.id, b.title,
 		case when u.username is null then '익명'
-		else u.username end username 
+		else
+		u.username end username
 		FROM boards b
 		LEFT OUTER JOIN
-		users u 
+		users u
 		ON b.usersId = u.id
 		<if test="keyword != null">
 			WHERE title LIKE CONCAT('%',#{keyword},'%')
- 		</if>
+		</if>
 		ORDER BY b.id DESC
 		OFFSET #{startNum} ROWS
 		FETCH NEXT 5 ROWS ONLY
 	</select>
 
 	<update id="update">
-		UPDATE boards SET title = #{title}, content = #{content} WHERE id = #{id}
+		UPDATE boards SET title = #{title}, content =
+		#{content} WHERE id = #{id}
 	</update>
 
 	<delete id="deleteById">
@@ -44,40 +51,24 @@
 		#{usersId}
 	</update>
 
-	<!-- <select id="paging" resultType="site.metacoding.red.web.dto.response.boards.PagingDto">
-		SELECT
-		floor(currentPage/blockCount) blockPage,
-		blockCount,
-		1+(floor(currentPage/blockCount)*blockCount) startPageNum,
-		case when 5+(floor(currentPage/blockCount)*blockCount) > totalPage then
-		totalPage
-		else 5+(floor(currentPage/blockCount)*blockCount) end lastPageNum,
-		totalCount,
-		totalPage,
-		currentPage,
-		CASE WHEN currentPage = 0 THEN 1
-		ELSE 0 END isFirst,
-		CASE WHEN currentPage = totalPage-1 THEN 1
-		ELSE 0 END isLast
-		FROM
-		(
-		SELECT 0 blockPage, 5 blockCount, 0 startPageNum, 0 lastPageNum, count(*)
-		totalCount, ceil(count(*)/3) totalPage, #{page} currentPage, 0 isFirst, 0
-		isLast
-		FROM boards
-		<if test="keyword != null">
-			WHERE title LIKE CONCAT('%',#{keyword},'%')
- 		</if>
-		) boards
-		
-	</select> -->
-	
+	<!-- <select id="paging" resultType="site.metacoding.red.web.dto.response.boards.PagingDto"> 
+		SELECT floor(currentPage/blockCount) blockPage, blockCount, 1+(floor(currentPage/blockCount)*blockCount) 
+		startPageNum, case when 5+(floor(currentPage/blockCount)*blockCount) > totalPage 
+		then totalPage else 5+(floor(currentPage/blockCount)*blockCount) end lastPageNum, 
+		totalCount, totalPage, currentPage, CASE WHEN currentPage = 0 THEN 1 ELSE 
+		0 END isFirst, CASE WHEN currentPage = totalPage-1 THEN 1 ELSE 0 END isLast 
+		FROM ( SELECT 0 blockPage, 5 blockCount, 0 startPageNum, 0 lastPageNum, count(*) 
+		totalCount, ceil(count(*)/3) totalPage, #{page} currentPage, 0 isFirst, 0 
+		isLast FROM boards <if test="keyword != null"> WHERE title LIKE CONCAT('%',#{keyword},'%') 
+		</if> ) boards </select> -->
+
 	<select id="paging"
 		resultType="site.metacoding.red.web.dto.response.boards.PagingDto">
 		SELECT totalCount,
 		totalPage,
 		currentPage,
-		if(currentPage = 0, 1, 0) first,
+		if(currentPage = 0, 1, 0)
+		first,
 		if(currentPage = totalPage-1, 1, 0) last
 		FROM
 		(
@@ -92,5 +83,22 @@
 		</if>
 		) result
 	</select>
+
+	<insert id="insertLike">
+		INSERT INTO likes(usersId, boardsId, createdAt)
+		VALUES(#{usersId}, #{boardsId}, now())
+	</insert>
+
+	<delete id="deleteLike">
+		DELETE FROM likes WHERE usersId = #{usersId} AND
+		boardsId = #{boardsId}
+	</delete>
+
+
+	<select id="likeCount"
+		resultType="site.metacoding.red.web.dto.response.boards.LikeDto">
+		SELECT * FROM likes WHERE boardsId = #{boardsId}
+	</select>
+
 
 </mapper>

@@ -7,7 +7,6 @@ import site.metacoding.red.domain.boards.Boards;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class UpdateDto {
 	private String title;
 	private String content;

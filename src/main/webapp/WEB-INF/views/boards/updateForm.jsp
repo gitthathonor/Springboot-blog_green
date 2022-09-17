@@ -43,7 +43,7 @@
 		}).done((res)=>{
 			if(res.code == 1) {
 				alert("글 정보 수정완료");
-				location.href="/";
+				location.reload();
 			} else {
 				alert("글 정보 수정에 실패하였습니다.");
 			}

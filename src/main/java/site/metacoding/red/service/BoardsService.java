@@ -11,6 +11,7 @@ import site.metacoding.red.domain.boards.BoardsDao;
 import site.metacoding.red.domain.users.Users;
 import site.metacoding.red.web.dto.request.boards.UpdateDto;
 import site.metacoding.red.web.dto.request.boards.WriteDto;
+import site.metacoding.red.web.dto.response.boards.LikeDto;
 import site.metacoding.red.web.dto.response.boards.MainDto;
 import site.metacoding.red.web.dto.response.boards.PagingDto;
 
@@ -63,4 +64,23 @@ public class BoardsService {
 		boardsDao.findById(id);
 		boardsDao.deleteById(id);
 	}
+	
+	
+	@Transactional(rollbackFor = RuntimeException.class)
+	public int 좋아요(Integer usersId, Integer boardsId) {
+		boardsDao.insertLike(usersId, boardsId);
+		List<LikeDto> likeList = boardsDao.likeCount(boardsId);
+		int likes = likeList.size();
+		return likes;
+	}
+	
+	
+	@Transactional(rollbackFor = RuntimeException.class)
+	public int 좋아요취소(Integer usersId, Integer boardsId) {
+		boardsDao.deleteLike(usersId, boardsId);
+		List<LikeDto> likeList = boardsDao.likeCount(boardsId);
+		int likes = likeList.size();
+		return likes;
+	}
+	
 }
