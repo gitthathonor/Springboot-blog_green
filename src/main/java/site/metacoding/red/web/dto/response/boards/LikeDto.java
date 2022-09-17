@@ -6,7 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LikeDto {
-	private Integer usersId;
-	private Integer boardsId;
+	private Integer likeCount;
 	private boolean isLike;
 }

@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import lombok.RequiredArgsConstructor;
 import site.metacoding.red.domain.boards.Boards;
+import site.metacoding.red.domain.boards.Likes;
 import site.metacoding.red.domain.users.Users;
 import site.metacoding.red.service.BoardsService;
 import site.metacoding.red.web.dto.request.boards.UpdateDto;
 import site.metacoding.red.web.dto.request.boards.WriteDto;
 import site.metacoding.red.web.dto.response.CMRespDto;
+import site.metacoding.red.web.dto.response.boards.LikeDto;
 import site.metacoding.red.web.dto.response.boards.PagingDto;
 
 @Controller
@@ -80,30 +82,19 @@ public class BoardsController {
 		return new CMRespDto<>(1, "게시글 삭제완료", null);
 	}
 	
-	// 좋아요 눌렀을 때 
+	
+	// 좋아요 
 	@PostMapping("/boards/{id}/like")
-	public @ResponseBody CMRespDto<?> insertLike(@PathVariable Integer id) {
-		Users principal = (Users) session.getAttribute("principal");
-		try {
-			return new CMRespDto<>(1, "좋아요", boardsService.좋아요(principal.getId(), id));
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new CMRespDto<>(-1, "principal이 null 입니다.", null);
+	public @ResponseBody CMRespDto<?> likeBoards(@PathVariable Integer id, @RequestBody Likes likes, Model model) {
+		System.out.println("컨트롤러 시작");
+		Users principal = (Users)session.getAttribute("principal");
+		if(principal == null) {
+			return new CMRespDto<>(-1, "로그인을 해주세요", null);
 		}
+		LikeDto like = boardsService.게시글좋아요(likes);
+		model.addAttribute("like", like);
+		return new CMRespDto<>(1, "좋아요!", null);
 	}
 	
-	
-	// 좋아요 삭제했을 때
-	@DeleteMapping("/boards/{id}/like")
-	public @ResponseBody CMRespDto<?> deleteLike(@PathVariable Integer id) {
-		Users principal = (Users) session.getAttribute("principal");
-		try {
-			return new CMRespDto<>(1, "좋아요 취소", boardsService.좋아요취소(principal.getId(), id));
-		} catch(Exception e) {
-			e.printStackTrace();
-			return new CMRespDto<>(-1, "principal이 null 입니다.", null);
-		}
-		
-	}
-
+	// 좋아요 취소
 }

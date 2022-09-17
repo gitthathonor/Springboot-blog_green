@@ -12,9 +12,7 @@
 
 	<select id="findById"
 		resultType="site.metacoding.red.domain.boards.Boards">
-		SELECT id, title, content, usersId, createdAt, (SELECT COUNT(*)
-		FROM likes
-		WHERE boardsId = #{id}) likeCounts
+		SELECT *
 		FROM boards
 		WHERE id = #{id};
 	</select>
@@ -28,7 +26,8 @@
 		FROM boards b
 		LEFT OUTER JOIN
 		users u
-		ON b.usersId = u.id
+		ON b.usersId
+		= u.id
 		<if test="keyword != null">
 			WHERE title LIKE CONCAT('%',#{keyword},'%')
 		</if>
@@ -89,16 +88,14 @@
 		VALUES(#{usersId}, #{boardsId}, now())
 	</insert>
 
-	<delete id="deleteLike">
-		DELETE FROM likes WHERE usersId = #{usersId} AND
-		boardsId = #{boardsId}
-	</delete>
 
-
-	<select id="likeCount"
+	<select id="showLikeCount"
 		resultType="site.metacoding.red.web.dto.response.boards.LikeDto">
-		SELECT * FROM likes WHERE boardsId = #{boardsId}
+		SELECT COUNT((SELECT COUNT(*) FROM likes WHERE boardsId =
+		#{boardsId})) likeCount, if((SELECT count(*) FROM likes WHERE boardsId = #{boardsId} AND
+		usersId = #{usersId}) != 0, 1,0) isLike
+		FROM likes
+		WHERE boardsId = #{boardsId}
 	</select>
-
 
 </mapper>

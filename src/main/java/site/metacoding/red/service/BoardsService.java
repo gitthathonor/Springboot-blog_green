@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import site.metacoding.red.domain.boards.Boards;
 import site.metacoding.red.domain.boards.BoardsDao;
+import site.metacoding.red.domain.boards.Likes;
 import site.metacoding.red.domain.users.Users;
 import site.metacoding.red.web.dto.request.boards.UpdateDto;
 import site.metacoding.red.web.dto.request.boards.WriteDto;
@@ -65,22 +66,12 @@ public class BoardsService {
 		boardsDao.deleteById(id);
 	}
 	
-	
-	@Transactional(rollbackFor = RuntimeException.class)
-	public int 좋아요(Integer usersId, Integer boardsId) {
-		boardsDao.insertLike(usersId, boardsId);
-		List<LikeDto> likeList = boardsDao.likeCount(boardsId);
-		int likes = likeList.size();
-		return likes;
+	// 좋아요
+	public LikeDto 게시글좋아요(Likes likes) {
+		System.out.println("service 시작");
+		boardsDao.insertLike(likes);
+		return boardsDao.showLikeCount(likes.getUsersId(), likes.getBoardsId());
 	}
 	
-	
-	@Transactional(rollbackFor = RuntimeException.class)
-	public int 좋아요취소(Integer usersId, Integer boardsId) {
-		boardsDao.deleteLike(usersId, boardsId);
-		List<LikeDto> likeList = boardsDao.likeCount(boardsId);
-		int likes = likeList.size();
-		return likes;
-	}
-	
+	// 좋아요 취소
 }

@@ -16,14 +16,9 @@ public interface BoardsDao {
 	public void update(Boards boards);
 	public void deleteById(Integer id);
 	public void updateNullData(Integer usersId);
-	
-	// 좋아요 입력
-	public void insertLike(@Param("usersId") Integer usersId, @Param("boardsId") Integer boardsId);
-	
-	// 좋아요 삭제
-	public void deleteLike(@Param("usersId") Integer usersId, @Param("boardsId") Integer boardsId);
-	
-	// 좋아요 총 갯수 보여주기
-	public List<LikeDto> likeCount(Integer boardsId);
-	
+	//좋아요(insert)
+	public void insertLike(Likes likes);
+	//좋아요취소(delete)
+	//LikeDto(select)
+	public LikeDto showLikeCount(@Param("usersId") Integer usersId, @Param("boardsId") Integer boardsId);
 }
