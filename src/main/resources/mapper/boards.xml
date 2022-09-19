@@ -83,19 +83,4 @@
 		) result
 	</select>
 
-	<insert id="insertLike">
-		INSERT INTO likes(usersId, boardsId, createdAt)
-		VALUES(#{usersId}, #{boardsId}, now())
-	</insert>
-
-
-	<select id="showLikeCount"
-		resultType="site.metacoding.red.web.dto.response.boards.LikeDto">
-		SELECT COUNT((SELECT COUNT(*) FROM likes WHERE boardsId =
-		#{boardsId})) likeCount, if((SELECT count(*) FROM likes WHERE boardsId = #{boardsId} AND
-		usersId = #{usersId}) != 0, 1,0) isLike
-		FROM likes
-		WHERE boardsId = #{boardsId}
-	</select>
-
 </mapper>

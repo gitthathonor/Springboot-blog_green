@@ -40,6 +40,13 @@ create table boards(
     createdAt TIMESTAMP
 );
 
+create table loves(
+    id int primary KEY auto_increment,
+    usersId int UNIQUE,
+    boardsId int,
+    createdAt TIMESTAMP,
+     UNIQUE KEY loves (usersId, boardsId)
+);
 
 ```
 

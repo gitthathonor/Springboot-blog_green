@@ -2,104 +2,135 @@
 
 <%@ include file="../layout/header.jsp"%>
 
+<input id="page" type="hidden" value="${sessionScope.referer.page}">
+<input id="keyword" type="hidden" value="${sessionScope.referer.keyword}">
 <div class="container">
-	<br /> <br />
-	<c:if test="${boards.usersId == principal.id && principal.id != null}">
-		<div class="d-flex">
-			<a href="/boards/${boards.id}/updateForm"><button type="submit" class="btn btn-warning">수정하러가기</button></a>
-			<form>
-				<input id="id" type="hidden" value="${boards.id }">
-				<button id="btnDeleteBoards" type="button" class="btn btn-danger">삭제</button>
-			</form>
-		</div>
-	</c:if>
+   <br /> <br /> 
+   <input id="id" type="hidden" value="${detailDto.boards.id}" />
+   <div class="d-flex">
 
-	<br />
-	<div class="d-flex justify-content-between">
-		<h3>${boards.title }</h3>
-		<div>
-			좋아요 : ${like.likeCount }<i id="like" class="fa-regular fa-heart">
-			<input id="usersId" type="hidden" value="${principal.id}">
-			<input id="boardsId" type="hidden" value="${boards.id}">
-			</i>
-		</div>
-	</div>
-	<hr />
+      <a href="/boards/${detailDto.boards.id}/updateForm" class="btn btn-warning">수정하러가기</a>
 
-	<div>${boards.content }</div>
+      <form>
+         <button id="btnDelete" class="btn btn-danger">삭제</button>
+      </form>
+   </div>
 
+   <br />
+   <div class="d-flex justify-content-between">
+      <h3>${detailDto.boards.title}</h3>
+      <div>
+         좋아요수 : <span id="countLove">${detailDto.lovesDto.count}</span> 
+         <i id="iconLove" class='${detailDto.lovesDto.loved ? "fa-solid" : "fa-regular"} fa-heart my_pointer my_red'>
+		         <input id="usersId" type="hidden" value="${sessionScope.principal.id}">
+		         <input id="boardsId" type="hidden" value="${detailDto.boards.id}">
+         </i>
+      </div>
+   </div>
+   <hr />
+
+   <div>${detailDto.boards.content}</div>
 </div>
 
 <script>
-	$("#like").click((event)=>{
-		
-		let usersId = $("#usersId").val();
-		console.log(usersId);
-		
-		let boardsId = $("#boardsId").val();
-		console.log(boardsId);
-		
-		let check = $("#like").hasClass("fa-solid");
-		console.log(check);	
-		
-		let data = {
-			usersId:usersId,
-			boardsId:boardsId,
-		};
-		console.log(data);
-				
-		if(check == true) { // 좋아요가 눌러진 상태
-			$("#like").removeClass("fa-solid");
-			$("#like").addClass("fa-regular");
-			$("#like").css("color", "black");	
-		} else { // 좋아요가 안 눌러진 상태
-			
-			$.ajax("/boards/"+boardsId+"/like",{
-				type: "POST",
-				dataType: "json",
-				data: JSON.stringify(data),
-				headers: {
-					"Content-Type": "application/json"
-				}
-			}).done((res)=>{
-				if(res.code==1) {
-					$("#like").removeClass("fa-regular");
-					$("#like").addClass("fa-solid");
-					$("#like").css("color", "red");
-				} else {
-					location.href="/loginForm";
-				}
-			});
-			
-			
-		}
-	});
-	
-	
-	$("#btnDeleteBoards").click(()=>{
-		deleteBoards();
-	});
-	
-	function deleteBoards() {
-		
-		let id = $("#id").val();
-		console.log(id);
 
-		$.ajax("/boards/" + id, {
-			type: "DELETE",
-			dataType: "json"
-		}).done((res) => {
-			if (res.code == 1) {
-				alert("게시글 삭제완료");
-				location.href = "/";
-			} else {
-				alert("게시글 삭제실패");
-			}
-		});
-	}
+   $("#btnDelete").click(()=>{
+      deleteById();
+   });
+   
+   function deleteById(){
+      let id = $("#id").val();
+      
+      let page = $("#page").val();
+      let keyword = $("#keyword").val();
+      
+      $.ajax("/boards/" + id, {
+         type: "DELETE",
+         dataType: "json" // 응답 데이터
+      }).done((res) => {
+         if (res.code == 1) {
+            //location.href = document.referrer;
+            location.href = "/?page="+page+"&keyword="+keyword;  //  /?page=?&keyword=?
+         } else {
+            alert("글삭제 실패");
+         }
+      });
+   }
+   
+
+   // 하트 아이콘을 클릭했을때의 로직
+   $("#iconLove").click(()=>{
+      let isLovedState = $("#iconLove").hasClass("fa-solid");
+      if(isLovedState){
+         deleteLove();
+      }else{
+         insertLove();
+      }
+   });
+   
+   // DB에 insert 요청하기
+   function insertLove(){
+      let id = $("#id").val();
+      
+      $.ajax("/boards/"+id+"/loves", {
+         type: "POST",
+         dataType: "json"
+      }).done((res) => {
+         if (res.code == 1) {
+            renderLoves();
+         	// 좋아요 수 1 증가
+            let count = $("#countLove").text();
+            $("#countLove").text(++count);
+         }else{
+            alert("좋아요 실패했습니다");
+         }
+      });
+   }
+   
+   // DB에 delete 요청하기
+   function deleteLove(){
+	   		let id = $("#id").val();
+	   		
+	   		let data = {
+	   			usersId: $("#usersId").val(),
+	   			boardsId: $("#boardsId").val()
+	   		};
+	   		
+	   		console.log(data);
+	   		
+	      $.ajax("/boards/"+id+"/loves", {
+	         type: "DELETE",
+	         dataType: "json",
+	         data: JSON.stringify(data), // http body에 들고갈 요청 데이터
+	 		 headers: { // http header에 들고갈 요청 데이터
+	 			"Content-Type": "application/json; charset=utf-8"
+	 		 }
+	      }).done((res) => {
+	         if (res.code == 1) {
+	        	 renderCancelLoves();
+	         	// 좋아요 수 1 감소
+	            let count = $("#countLove").text();
+	            $("#countLove").text(--count);
+	         }else{
+	            alert("좋아요 취소에 실패했습니다");
+	         }
+	      });
+   }
+   
+   // 빨간색 하트 그리기
+   function renderLoves(){
+      $("#iconLove").removeClass("fa-regular");
+      $("#iconLove").addClass("fa-solid");
+   }
+   
+   // 검정색 하트 그리기
+   function renderCancelLoves(){
+      $("#iconLove").removeClass("fa-solid");
+      $("#iconLove").addClass("fa-regular");
+   }
+
 </script>
 
-
-
 <%@ include file="../layout/footer.jsp"%>
+
 

@@ -23,9 +23,9 @@
 		<tbody>
 			<c:forEach var="boards" items="${paging.mainDtos}">
 				<tr>
-					<td>${boards.id }</td>
-					<td><a href="/boards/${boards.id}">${boards.title }</a></td>
-					<td>${boards.username }</td>
+					<td>${boards.id}</td>
+					<td><a href="/boards/${boards.id}">${boards.title}</a></td>
+					<td>${boards.username}</td>
 				</tr>
 			</c:forEach>
 		</tbody>

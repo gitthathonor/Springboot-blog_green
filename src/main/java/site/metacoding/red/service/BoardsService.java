@@ -8,20 +8,36 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import site.metacoding.red.domain.boards.Boards;
 import site.metacoding.red.domain.boards.BoardsDao;
-import site.metacoding.red.domain.boards.Likes;
+import site.metacoding.red.domain.loves.Loves;
+import site.metacoding.red.domain.loves.LovesDao;
 import site.metacoding.red.domain.users.Users;
+import site.metacoding.red.domain.users.UsersDao;
 import site.metacoding.red.web.dto.request.boards.UpdateDto;
 import site.metacoding.red.web.dto.request.boards.WriteDto;
-import site.metacoding.red.web.dto.response.boards.LikeDto;
+import site.metacoding.red.web.dto.response.boards.DetailDto;
 import site.metacoding.red.web.dto.response.boards.MainDto;
 import site.metacoding.red.web.dto.response.boards.PagingDto;
+import site.metacoding.red.web.dto.response.loves.LovesDto;
 
 //Transaction을 관리해준다.
 @Service
 @RequiredArgsConstructor
 public class BoardsService {
 	
+	private final UsersDao usersDao;
 	private final BoardsDao boardsDao;
+	private final LovesDao lovesDao;
+	
+	
+	
+	public void 좋아요(Loves loves) {
+		lovesDao.insert(loves);
+	}
+	
+	public void 좋아요취소(Loves loves) {
+		lovesDao.deleteByLoves(loves);
+	}
+	
 	
 	public void 글쓰기(WriteDto writeDto, Users principal) {
 		boardsDao.insert(writeDto.toEntity(principal.getId()));
@@ -48,8 +64,18 @@ public class BoardsService {
 		return pagingDto;
 	}
 	
+	public DetailDto 게시글상세보기(Integer principalId, Integer id) {
+		Boards boardsPS = boardsDao.findById(id);
+		LovesDto lovesDto = lovesDao.findByBoardsId(principalId, id);
+		if(lovesDto == null) {
+	         lovesDto = new LovesDto();
+	         lovesDto.setCount(0);
+	         lovesDto.setLoved(false);
+	      }
+	      return new DetailDto(boardsPS, lovesDto);
+	}
 	
-	public Boards 게시글상세보기(Integer id) {
+	public Boards 게시글수정화면데이터(Integer id) {
 		return boardsDao.findById(id);
 	}
 	
@@ -65,13 +91,4 @@ public class BoardsService {
 		boardsDao.findById(id);
 		boardsDao.deleteById(id);
 	}
-	
-	// 좋아요
-	public LikeDto 게시글좋아요(Likes likes) {
-		System.out.println("service 시작");
-		boardsDao.insertLike(likes);
-		return boardsDao.showLikeCount(likes.getUsersId(), likes.getBoardsId());
-	}
-	
-	// 좋아요 취소
 }
