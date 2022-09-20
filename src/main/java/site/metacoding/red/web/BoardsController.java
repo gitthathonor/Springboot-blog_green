@@ -38,22 +38,30 @@ public class BoardsController {
 	// 이런 기능은 작은 기능이기 때문에 상황에 맞게 끼워넣으면 된다.
 	// 일반적으로는 빼서 사용하는 것이 좋긴 하다.
 	// 어떤 게시글을 누가 좋아하는지 (boardsId, usersId)
-	@PostMapping("/boards/{id}/loves") // 주소의 가독성이 좋아서 id를 넣었다. 프로토콜 대로 하면 /loves로 해서 http의 body로 boardsId를 받아야 한다. 중점을 두는 거에 따라 다르다.
+	@PostMapping("/s/api/boards/{id}/loves") // 주소의 가독성이 좋아서 id를 넣었다. 프로토콜 대로 하면 /loves로 해서 http의 body로 boardsId를 받아야 한다. 중점을 두는 거에 따라 다르다.
 	public @ResponseBody CMRespDto<?> insertLoves(@PathVariable Integer id) {
 		Users principal = (Users) session.getAttribute("principal");
+		if(principal == null) {
+			return new CMRespDto<>(-1, "로그인 되지 않았습니다.", null);
+		}
 		Loves loves = new Loves(principal.getId(),id);
 		boardsService.좋아요(loves);
 		return new CMRespDto<>(1, "좋아요 성공", null);
 	}
 	
-	@DeleteMapping("/boards/{id}/loves")
+	@DeleteMapping("/s/api/boards/{id}/loves")
 	public @ResponseBody CMRespDto<?> deleteLoves(@PathVariable Integer id, @RequestBody Loves loves) {
+		Users principal = (Users) session.getAttribute("principal");
 		Loves deleteLove = new Loves(loves.getUsersId(), loves.getBoardsId());
+		
+		if(principal == null) {
+			return new CMRespDto<>(-1, "로그인 되지 않았습니다.", null);
+		}
 		boardsService.좋아요취소(deleteLove);
 		return new CMRespDto<>(1, "좋아요 취소 성공", null);
 	}
 	
-	@GetMapping("/boards/writeForm")
+	@GetMapping("/s/boards/writeForm")
 	public String writeForm() {
 		Users principal = (Users) session.getAttribute("principal");
 		if (principal == null) {
@@ -62,7 +70,7 @@ public class BoardsController {
 		return "boards/writeForm";
 	}
 	
-	@PostMapping("/boards")
+	@PostMapping("/s/api/boards")
 	public @ResponseBody CMRespDto<?> write(@RequestBody WriteDto writeDto) {
 		Users principal = (Users) session.getAttribute("principal");
 		boardsService.글쓰기(writeDto, principal);
@@ -96,26 +104,23 @@ public class BoardsController {
 		return "boards/main";
 	}
 	
-	@GetMapping("/boards/{id}/updateForm")
+	@GetMapping("/s/boards/{id}/updateForm")
 	public String updateForm(@PathVariable Integer id, Model model) {
 		Boards boardsPS = boardsService.게시글수정화면데이터(id);
 		model.addAttribute("boards", boardsPS);
 		return "boards/updateForm";
 	}
 	
-	@PutMapping("/boards/{id}")
+	@PutMapping("/s/api/boards/{id}")
 	public @ResponseBody CMRespDto<?> update(@PathVariable Integer id, @RequestBody UpdateDto updateDto) {
 		boardsService.수정하기(id, updateDto);
 		return new CMRespDto<>(1, "게시글 수정 성공", null);
 	}
 	
 
-	@DeleteMapping("/boards/{id}")
+	@DeleteMapping("/s/api/boards/{id}")
 	public @ResponseBody CMRespDto<?> deleteBoards(@PathVariable Integer id, Integer page, String keyword, Model model) {
 		boardsService.삭제하기(id);
-		PagingDto pagingDto = boardsService.게시글목록보기(page, keyword);
-		model.addAttribute("paging", pagingDto);
-		model.addAttribute("keyword", keyword);
-		return new CMRespDto<>(1, "게시글 삭제완료", pagingDto);
+		return new CMRespDto<>(1, "게시글 삭제완료", null);
 	}
 }

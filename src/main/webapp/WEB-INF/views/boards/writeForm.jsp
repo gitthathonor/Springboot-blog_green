@@ -14,38 +14,7 @@
 	</form>
 </div>
 
-<script>
-	$('#content').summernote({
-		tabsize: 2,
-		height: 400
-	});
-
-
-	$("#btnSave").click(()=>{
-		save();
-	});
-	
-	
-	function save() {
-		let data = {
-				title: $("#title").val(),
-				content: $("#content").val()
-			};
-
-			$.ajax("/boards", {
-				type: "POST",
-				dataType: "json",
-				data: JSON.stringify(data),
-				headers: {
-					"Content-Type": "application/json"
-				}
-			}).done((res) => {
-				if (res.code == 1) {
-					location.href = "/";
-				}
-			});
-	}
-</script>
+<script src="/js/boards.js"></script>
 
 <%@ include file="../layout/footer.jsp"%>
 

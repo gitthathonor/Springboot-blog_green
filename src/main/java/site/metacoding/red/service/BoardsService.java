@@ -24,11 +24,8 @@ import site.metacoding.red.web.dto.response.loves.LovesDto;
 @RequiredArgsConstructor
 public class BoardsService {
 	
-	private final UsersDao usersDao;
 	private final BoardsDao boardsDao;
 	private final LovesDao lovesDao;
-	
-	
 	
 	public void 좋아요(Loves loves) {
 		lovesDao.insert(loves);

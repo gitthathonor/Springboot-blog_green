@@ -15,44 +15,7 @@
 	</form>
 </div>
 
-<script>
-	$('#content').summernote({
-		tabsize: 2,
-		height: 400
-	});
-</script>
-
-<script>	
-	$("#btnUpdate").click(()=>{
-		update();
-	});
-	
-	function update() {
-		let data = {
-			title: $("#title").val(),
-			content: $("#content").val()
-		};
-		
-		let id = $("#id").val();
-		
-		$.ajax("/boards/"+id,{
-			type: "PUT",
-			dataType: "json",
-			data: JSON.stringify(data),
-			headers: {
-				"Content-Type": "application/json; charset=utf-8"
-			}
-		}).done((res)=>{
-			if(res.code == 1) {
-				alert("게시글 수정완료");
-				location.href="/boards/"+id;
-			} else {
-				alert("게시글 수정에 실패하였습니다.");
-			}
-		});
-		
-	}
-</script>
+<script src="/js/boards.js"></script>
 
 <%@ include file="../layout/footer.jsp"%>
 

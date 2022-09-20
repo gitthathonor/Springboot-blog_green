@@ -2,19 +2,20 @@
 
 <%@ include file="../layout/header.jsp"%>
 
-<input id="page" type="hidden" value="${sessionScope.referer.page}">
-<input id="keyword" type="hidden" value="${sessionScope.referer.keyword}">
+<input id="page" type="hidden" value="${sessionScope.referrer.page}">
+<input id="keyword" type="hidden" value="${sessionScope.referrer.keyword}">
 <div class="container">
    <br /> <br /> 
    <input id="id" type="hidden" value="${detailDto.boards.id}" />
-   <div class="d-flex">
-
-      <a href="/boards/${detailDto.boards.id}/updateForm" class="btn btn-warning">수정하러가기</a>
-
-      <form>
-         <button id="btnDelete" class="btn btn-danger">삭제</button>
-      </form>
-   </div>
+   
+   <c:if test="${!empty principal}">
+	   <div class="d-flex">
+	      <a href="/boards/${detailDto.boards.id}/updateForm" class="btn btn-warning">수정하러가기</a>
+	      <form>
+	         <button id="btnDelete" class="btn btn-danger">삭제</button>
+	      </form>
+	   </div>
+   </c:if>
 
    <br />
    <div class="d-flex justify-content-between">
@@ -32,104 +33,7 @@
    <div>${detailDto.boards.content}</div>
 </div>
 
-<script>
-
-   $("#btnDelete").click(()=>{
-      deleteById();
-   });
-   
-   function deleteById(){
-      let id = $("#id").val();
-      
-      let page = $("#page").val();
-      let keyword = $("#keyword").val();
-      
-      $.ajax("/boards/" + id, {
-         type: "DELETE",
-         dataType: "json" // 응답 데이터
-      }).done((res) => {
-         if (res.code == 1) {
-            //location.href = document.referrer;
-            location.href = "/?page="+page+"&keyword="+keyword;  //  /?page=?&keyword=?
-         } else {
-            alert("글삭제 실패");
-         }
-      });
-   }
-   
-
-   // 하트 아이콘을 클릭했을때의 로직
-   $("#iconLove").click(()=>{
-      let isLovedState = $("#iconLove").hasClass("fa-solid");
-      if(isLovedState){
-         deleteLove();
-      }else{
-         insertLove();
-      }
-   });
-   
-   // DB에 insert 요청하기
-   function insertLove(){
-      let id = $("#id").val();
-      
-      $.ajax("/boards/"+id+"/loves", {
-         type: "POST",
-         dataType: "json"
-      }).done((res) => {
-         if (res.code == 1) {
-            renderLoves();
-         	// 좋아요 수 1 증가
-            let count = $("#countLove").text();
-            $("#countLove").text(++count);
-         }else{
-            alert("좋아요 실패했습니다");
-         }
-      });
-   }
-   
-   // DB에 delete 요청하기
-   function deleteLove(){
-	   		let id = $("#id").val();
-	   		
-	   		let data = {
-	   			usersId: $("#usersId").val(),
-	   			boardsId: $("#boardsId").val()
-	   		};
-	   		
-	   		console.log(data);
-	   		
-	      $.ajax("/boards/"+id+"/loves", {
-	         type: "DELETE",
-	         dataType: "json",
-	         data: JSON.stringify(data), // http body에 들고갈 요청 데이터
-	 		 headers: { // http header에 들고갈 요청 데이터
-	 			"Content-Type": "application/json; charset=utf-8"
-	 		 }
-	      }).done((res) => {
-	         if (res.code == 1) {
-	        	 renderCancelLoves();
-	         	// 좋아요 수 1 감소
-	            let count = $("#countLove").text();
-	            $("#countLove").text(--count);
-	         }else{
-	            alert("좋아요 취소에 실패했습니다");
-	         }
-	      });
-   }
-   
-   // 빨간색 하트 그리기
-   function renderLoves(){
-      $("#iconLove").removeClass("fa-regular");
-      $("#iconLove").addClass("fa-solid");
-   }
-   
-   // 검정색 하트 그리기
-   function renderCancelLoves(){
-      $("#iconLove").removeClass("fa-solid");
-      $("#iconLove").addClass("fa-regular");
-   }
-
-</script>
+<script src="/js/boards.js"></script>
 
 <%@ include file="../layout/footer.jsp"%>
 
